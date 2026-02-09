@@ -14,6 +14,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
   <style>
     :root {
       --bg-primary: #0a0a0f;
@@ -472,9 +474,9 @@
 
     .research-tag {
       font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      padding: 0.25rem 0.6rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      padding: 0.3rem 0.7rem;
       border-radius: 4px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.05);
@@ -484,7 +486,6 @@
        CONTACT SECTION
     ═══════════════════════════════════════════ */
     .contact-content {
-      text-align: center;
     }
 
     .contact-content > p {
@@ -492,82 +493,100 @@
       font-size: 1.05rem;
       margin-bottom: 2.5rem;
       max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
     }
 
-    .contact-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 1rem;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    .contact-card {
+    /* ═══════════════════════════════════════════
+       CONTACT BUTTONS
+    ═══════════════════════════════════════════ */
+    .contact-block {
+      margin-top: 1.5rem;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 1.5rem 1rem;
-      border-radius: 10px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      text-decoration: none;
-      color: var(--text-secondary);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .contact-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 10px;
-      padding: 1px;
-      background: linear-gradient(135deg, transparent, transparent);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      transition: background 0.4s ease;
-    }
-
-    .contact-card:hover::before {
-      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-    }
-
-    .contact-card:hover {
-      color: var(--text-primary);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .contact-icon {
-      font-size: 1.3rem;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      background: rgba(108, 92, 231, 0.1);
-      transition: all 0.3s ease;
-    }
-
-    .contact-card:hover .contact-icon {
-      background: rgba(108, 92, 231, 0.2);
+      align-items: flex-start;
     }
 
     .contact-label {
-      font-size: 0.85rem;
-      font-weight: 500;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
     }
 
-    .contact-handle {
+    .contact-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.9rem 1.8rem;
+      border-radius: 10px;
+      background: var(--glass-bg);
+      border: 1px solid var(--border-glow);
+      color: var(--accent-1);
       font-family: 'Space Mono', monospace;
-      font-size: 0.72rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .contact-btn:hover {
+      border-color: var(--accent-1);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(108, 92, 231, 0.2);
+    }
+
+    .contact-btn:active {
+      transform: translateY(0);
+    }
+
+    .contact-btn-icon {
+      font-size: 1.1rem;
+    }
+
+    .contact-btn-text code {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--accent-1);
+      letter-spacing: 0.03em;
+    }
+
+    .contact-btn-copied {
+      position: absolute;
+      top: -2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
+      color: var(--accent-3);
+      opacity: 0;
+      pointer-events: none;
+      transition: none;
+    }
+
+    .contact-btn-copied.show {
+      animation: copiedPop 1.5s ease forwards;
+    }
+
+    @keyframes copiedPop {
+      0% { opacity: 0; top: -1rem; }
+      15% { opacity: 1; top: -2rem; }
+      70% { opacity: 1; top: -2rem; }
+      100% { opacity: 0; top: -2.5rem; }
+    }
+
+    .pgp-keyserver-link {
+      display: inline-block;
+      margin-top: 0.5rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
       color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .pgp-keyserver-link:hover {
+      color: var(--accent-1);
     }
 
     /* ═══════════════════════════════════════════
@@ -657,16 +676,17 @@
       .hero { padding: 4rem 1.5rem; padding-top: 5rem; }
       .hero h1 { font-size: 2.2rem; }
       .hero-sub { font-size: 1rem; }
-      .contact-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-links { justify-content: center; }
+
       .career-path { gap: 0.75rem; }
       .career-tag { font-size: 0.78rem; padding: 0.4rem 0.8rem; }
+      .scroll-indicator { display: none; }
     }
 
     @media (max-width: 480px) {
       .nav-links { gap: 0.8rem; }
-      .contact-grid { grid-template-columns: 1fr 1fr; }
-      .hero-links { flex-direction: column; }
-      .hero-link { justify-content: center; }
+      .hero-links { flex-direction: column; align-items: center; }
+      .hero-link { justify-content: center; width: 100%; }
     }
   </style>
 </head>
@@ -788,18 +808,28 @@
 
     <!-- ═══════════ CONTACT ═══════════ -->
     <section id="contact">
-      <div class="section-header reveal" style="text-align: center;">
+      <div class="section-header reveal">
         <div class="section-label">// 03 — connect</div>
         <h2 class="section-title">Get in Touch</h2>
       </div>
       <div class="contact-content reveal">
         <p>Open to conversations about threat research, vulnerability disclosure, AI+security, and collaboration.</p>
-        <div class="contact-grid" style="max-width: 280px;">
-          <a href="mailto:yokaihex@pm.me" class="contact-card">
-            <div class="contact-icon">✉</div>
-            <span class="contact-label">Email</span>
-            <span class="contact-handle">yokaihex@pm.me</span>
-          </a>
+        <div class="contact-block">
+          <div class="contact-label">Email</div>
+          <button class="contact-btn" onclick="copyEmail(this)">
+            <span class="contact-btn-icon">✉</span>
+            <span class="contact-btn-text">yokaihex@pm.me</span>
+            <span class="contact-btn-copied">Copied!</span>
+          </button>
+        </div>
+        <div class="contact-block">
+          <div class="contact-label">PGP Fingerprint</div>
+          <button class="contact-btn" onclick="copyFingerprint(this)">
+            <span class="contact-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span>
+            <span class="contact-btn-text"><code>BA82 9FAC C510 723E AFB8 E68A 4AC6 F642 F496 1E26</code></span>
+            <span class="contact-btn-copied">Copied!</span>
+          </button>
+          <a href="https://keys.openpgp.org/search?q=yokaihex%40pm.me" class="pgp-keyserver-link" target="_blank" rel="noopener">keys.openpgp.org ↗</a>
         </div>
       </div>
     </section>
@@ -895,6 +925,25 @@
       requestAnimationFrame(animate);
     }
     animate();
+
+    /* ═══════════════════════════════════════════
+       COPY EMAIL
+    ═══════════════════════════════════════════ */
+    function copyEmail(btn) {
+      navigator.clipboard.writeText('yokaihex@pm.me');
+      const copied = btn.querySelector('.contact-btn-copied');
+      copied.classList.remove('show');
+      void copied.offsetWidth;
+      copied.classList.add('show');
+    }
+
+    function copyFingerprint(btn) {
+      navigator.clipboard.writeText('BA829FACC510723EAFB8E68A4AC6F642F4961E26');
+      const copied = btn.querySelector('.contact-btn-copied');
+      copied.classList.remove('show');
+      void copied.offsetWidth;
+      copied.classList.add('show');
+    }
 
     /* ═══════════════════════════════════════════
        NAV SCROLL EFFECT
