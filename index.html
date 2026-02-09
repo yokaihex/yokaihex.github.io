@@ -1,0 +1,918 @@
+---
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>yokaihex — Security Researcher</title>
+  <meta name="description" content="Security researcher specializing in threat intelligence, vulnerability research, and AI-augmented security.">
+  <meta property="og:title" content="yokaihex — Security Researcher">
+  <meta property="og:description" content="Threat intelligence and vulnerability research.">
+  <meta property="og:url" content="https://yokaihex.com">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --bg-card: rgba(18, 18, 30, 0.6);
+      --text-primary: #e8e8ed;
+      --text-secondary: #8888a0;
+      --text-dim: #555570;
+      --accent-1: #6c5ce7;
+      --accent-2: #e84393;
+      --accent-3: #00cec9;
+      --accent-4: #fd79a8;
+      --border-subtle: rgba(136, 136, 160, 0.12);
+      --border-glow: rgba(108, 92, 231, 0.3);
+      --glass-bg: rgba(18, 18, 30, 0.65);
+      --glass-border: rgba(136, 136, 160, 0.1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent-1) var(--bg-primary);
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      line-height: 1.7;
+    }
+
+    /* ═══════════════════════════════════════════
+       PARTICLE CANVAS
+    ═══════════════════════════════════════════ */
+    #particle-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ═══════════════════════════════════════════
+       NAVIGATION
+    ═══════════════════════════════════════════ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(10, 10, 15, 0.7);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: all 0.4s ease;
+    }
+
+    nav.scrolled {
+      padding: 0.8rem 2rem;
+      background: rgba(10, 10, 15, 0.9);
+    }
+
+    .nav-brand {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-brand span {
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1.5px;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* ═══════════════════════════════════════════
+       LAYOUT
+    ═══════════════════════════════════════════ */
+    .content-wrapper {
+      position: relative;
+      z-index: 1;
+    }
+
+    section {
+      padding: 6rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* ═══════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 5rem;
+      max-width: 900px;
+      margin: 0 auto;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+
+    .hero-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent-1);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeSlideUp 0.8s ease 0.2s forwards;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeSlideUp 0.8s ease 0.4s forwards;
+    }
+
+    .hero h1 .gradient-text {
+      background: linear-gradient(
+        135deg,
+        var(--accent-1) 0%,
+        var(--accent-2) 25%,
+        var(--accent-4) 50%,
+        var(--accent-3) 75%,
+        var(--accent-1) 100%
+      );
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 8s ease infinite;
+    }
+
+    .hero-handle {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.3rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.03em;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeSlideUp 0.8s ease 0.5s forwards;
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 540px;
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeSlideUp 0.8s ease 0.7s forwards;
+    }
+
+    .hero-links {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeSlideUp 0.8s ease 0.9s forwards;
+    }
+
+    .hero-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .hero-link.primary {
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      color: white;
+    }
+    .hero-link.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(108, 92, 231, 0.35);
+    }
+
+    .hero-link.secondary {
+      border: 1px solid var(--border-glow);
+      color: var(--text-secondary);
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+    }
+    .hero-link.secondary:hover {
+      border-color: var(--accent-1);
+      color: var(--text-primary);
+      transform: translateY(-2px);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: fadeIn 1s ease 1.5s forwards;
+    }
+
+    .scroll-indicator span {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--accent-1), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+
+    /* ═══════════════════════════════════════════
+       SECTION HEADERS
+    ═══════════════════════════════════════════ */
+    .section-header {
+      margin-bottom: 3rem;
+    }
+
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent-1);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    .section-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border-subtle);
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section-divider::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, var(--accent-1), var(--accent-2), transparent);
+      animation: shimmerLine 4s ease infinite;
+    }
+
+    /* ═══════════════════════════════════════════
+       ABOUT SECTION
+    ═══════════════════════════════════════════ */
+    .about-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .about-text p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.9;
+      margin-bottom: 1.5rem;
+    }
+
+    .about-text p:last-child { margin-bottom: 0; }
+
+    .about-text strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .career-path {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    .career-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: 'Space Mono', monospace;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      transition: all 0.3s ease;
+    }
+
+    .career-tag:hover {
+      border-color: var(--accent-1);
+      color: var(--text-primary);
+    }
+
+    .career-tag .tag-year {
+      color: var(--accent-1);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    /* ═══════════════════════════════════════════
+       RESEARCH SECTION
+    ═══════════════════════════════════════════ */
+    .research-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .research-card {
+      position: relative;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 2rem;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+
+    .research-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(
+        120deg,
+        transparent 30%,
+        rgba(108, 92, 231, 0.06) 50%,
+        transparent 70%
+      );
+      transition: none;
+    }
+
+    .research-card:hover::before {
+      animation: shimmerOnce 0.8s ease forwards;
+    }
+
+    .research-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .research-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+
+    .research-card-venue {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent-1);
+      letter-spacing: 0.05em;
+      padding: 0.3rem 0.7rem;
+      border-radius: 4px;
+      background: rgba(108, 92, 231, 0.1);
+      border: 1px solid rgba(108, 92, 231, 0.2);
+    }
+
+    .research-card-arrow {
+      color: var(--text-dim);
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+    }
+
+    .research-card:hover .research-card-arrow {
+      color: var(--accent-1);
+      transform: translate(3px, -3px);
+    }
+
+    .research-card h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+    }
+
+    .research-card p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .research-card-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+    }
+
+    .research-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* ═══════════════════════════════════════════
+       CONTACT SECTION
+    ═══════════════════════════════════════════ */
+    .contact-content {
+      text-align: center;
+    }
+
+    .contact-content > p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      margin-bottom: 2.5rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .contact-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 1.5rem 1rem;
+      border-radius: 10px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      text-decoration: none;
+      color: var(--text-secondary);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 10px;
+      padding: 1px;
+      background: linear-gradient(135deg, transparent, transparent);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      transition: background 0.4s ease;
+    }
+
+    .contact-card:hover::before {
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    }
+
+    .contact-card:hover {
+      color: var(--text-primary);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .contact-icon {
+      font-size: 1.3rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: rgba(108, 92, 231, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .contact-card:hover .contact-icon {
+      background: rgba(108, 92, 231, 0.2);
+    }
+
+    .contact-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .contact-handle {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    /* ═══════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════ */
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      border-top: 1px solid var(--border-subtle);
+      position: relative;
+      z-index: 1;
+    }
+
+    footer p {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    footer .footer-disclaimer {
+      margin-top: 1rem;
+      color: var(--text-dim);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.75rem;
+      opacity: 0.45;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+
+    /* ═══════════════════════════════════════════
+       SCROLL REVEALS
+    ═══════════════════════════════════════════ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ═══════════════════════════════════════════
+       ANIMATIONS
+    ═══════════════════════════════════════════ */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(25px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 0.6; }
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 0.8; transform: scaleY(1.2); }
+    }
+
+    @keyframes shimmerLine {
+      0% { left: -100%; }
+      100% { left: 200%; }
+    }
+
+    @keyframes shimmerOnce {
+      from { left: -100%; }
+      to { left: 200%; }
+    }
+
+    /* ═══════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      nav { padding: 1rem; }
+      .nav-links { gap: 1.2rem; }
+      .nav-links a { font-size: 0.8rem; }
+      section { padding: 4rem 1.5rem; }
+      .hero { padding: 4rem 1.5rem; padding-top: 5rem; }
+      .hero h1 { font-size: 2.2rem; }
+      .hero-sub { font-size: 1rem; }
+      .contact-grid { grid-template-columns: repeat(2, 1fr); }
+      .career-path { gap: 0.75rem; }
+      .career-tag { font-size: 0.78rem; padding: 0.4rem 0.8rem; }
+    }
+
+    @media (max-width: 480px) {
+      .nav-links { gap: 0.8rem; }
+      .contact-grid { grid-template-columns: 1fr 1fr; }
+      .hero-links { flex-direction: column; }
+      .hero-link { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <nav id="navbar">
+    <a href="#" class="nav-brand"><span>妖怪</span>hex</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="content-wrapper">
+
+    <!-- ═══════════ HERO ═══════════ -->
+    <section class="hero" id="hero">
+      <div class="hero-label">// security researcher</div>
+      <h1>
+        I'm <span class="gradient-text">yokaihex</span>
+      </h1>
+      <div class="hero-handle">(Johnathan Arneson)</div>
+      <p class="hero-sub">
+        Principal Threat Research Engineer exploring the intersection of threat intelligence, vulnerability research, and AI-augmented security.
+      </p>
+      <div class="hero-links">
+        <a href="#research" class="hero-link primary">Published Research ↓</a>
+        <a href="#contact" class="hero-link secondary">Get in Touch</a>
+      </div>
+      <div class="scroll-indicator">
+        <span>scroll</span>
+        <div class="scroll-line"></div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════ ABOUT ═══════════ -->
+    <section id="about">
+      <div class="section-header reveal">
+        <div class="section-label">// 01 — about</div>
+        <h2 class="section-title">Background</h2>
+      </div>
+      <div class="about-content reveal">
+        <div class="about-text">
+          <p>
+            I'm a security researcher with a career built across the threat intelligence and vulnerability research landscape. Currently a <strong>Principal Threat Research Engineer at Recorded Future</strong>, I focus on identifying and analyzing emerging threats at scale.
+          </p>
+          <p>
+            Previously, I spent years at <strong>Cisco Talos</strong> (originally joining through <strong>Sourcefire</strong> before the Cisco acquisition), where I developed expertise in malware analysis, threat hunting, and building detection capabilities that protect millions of endpoints.
+          </p>
+          <p>
+            I'm particularly interested in how AI and automation can augment security research — making defenders faster, more thorough, and better equipped to handle the scale of modern threats.
+          </p>
+        </div>
+        <div class="career-path">
+          <div class="career-tag">
+            <span class="tag-year">2013</span> Sourcefire
+          </div>
+          <div class="career-tag">
+            <span class="tag-year">2013–2025</span> Cisco Talos
+          </div>
+          <div class="career-tag">
+            <span class="tag-year">2025–present</span> Recorded Future
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════ RESEARCH ═══════════ -->
+    <section id="research">
+      <div class="section-header reveal">
+        <div class="section-label">// 02 — published research</div>
+        <h2 class="section-title">Writing & Analysis</h2>
+      </div>
+      <div class="research-grid">
+
+        <a href="https://blog.talosintelligence.com/scarcity-signals-are-rare-activities-red-flags/" target="_blank" rel="noopener" class="research-card reveal">
+          <div class="research-card-header">
+            <span class="research-card-venue">Cisco Talos Blog</span>
+            <span class="research-card-arrow">↗</span>
+          </div>
+          <h3>Scarcity Signals: Are Rare Activities Red Flags?</h3>
+          <p>
+            Exploring whether the rarity of an observed activity is itself a meaningful signal for threat detection — examining the relationship between statistical scarcity and malicious intent in network telemetry.
+          </p>
+          <div class="research-card-tags">
+            <span class="research-tag">threat-detection</span>
+            <span class="research-tag">telemetry</span>
+            <span class="research-tag">signal-analysis</span>
+          </div>
+        </a>
+
+        <a href="https://blog.talosintelligence.com/amp-tracks-ursnif/" target="_blank" rel="noopener" class="research-card reveal">
+          <div class="research-card-header">
+            <span class="research-card-venue">Cisco Talos Blog</span>
+            <span class="research-card-arrow">↗</span>
+          </div>
+          <h3>AMP Tracks Ursnif</h3>
+          <p>
+            Deep-dive analysis into tracking Ursnif (Gozi/ISFB) banking trojan campaigns through Cisco's Advanced Malware Protection telemetry, revealing distribution patterns and evasion techniques.
+          </p>
+          <div class="research-card-tags">
+            <span class="research-tag">malware-analysis</span>
+            <span class="research-tag">ursnif</span>
+            <span class="research-tag">banking-trojan</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════ CONTACT ═══════════ -->
+    <section id="contact">
+      <div class="section-header reveal" style="text-align: center;">
+        <div class="section-label">// 03 — connect</div>
+        <h2 class="section-title">Get in Touch</h2>
+      </div>
+      <div class="contact-content reveal">
+        <p>Open to conversations about threat research, vulnerability disclosure, AI+security, and collaboration.</p>
+        <div class="contact-grid" style="max-width: 280px;">
+          <a href="mailto:yokaihex@pm.me" class="contact-card">
+            <div class="contact-icon">✉</div>
+            <span class="contact-label">Email</span>
+            <span class="contact-handle">yokaihex@pm.me</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <p>yokaihex © 2026</p>
+    <p class="footer-disclaimer">Independent research is my own. Employer-affiliated work is credited accordingly. Views expressed here do not represent my employer.</p>
+  </footer>
+
+  <script>
+    /* ═══════════════════════════════════════════
+       PARTICLE NETWORK
+    ═══════════════════════════════════════════ */
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let mouse = { x: null, y: null };
+    const PARTICLE_COUNT = 55;
+    const CONNECT_DISTANCE = 160;
+    const MOUSE_DISTANCE = 200;
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+    document.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = (Math.random() - 0.5) * 0.4;
+        this.r = Math.random() * 1.8 + 0.5;
+        this.baseAlpha = Math.random() * 0.4 + 0.15;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(108, 92, 231, ${this.baseAlpha})`;
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < CONNECT_DISTANCE) {
+            const alpha = (1 - dist / CONNECT_DISTANCE) * 0.15;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(108, 92, 231, ${alpha})`;
+            ctx.lineWidth = 0.6;
+            ctx.stroke();
+          }
+        }
+
+        if (mouse.x !== null) {
+          const dx = particles[i].x - mouse.x;
+          const dy = particles[i].y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MOUSE_DISTANCE) {
+            const alpha = (1 - dist / MOUSE_DISTANCE) * 0.25;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.strokeStyle = `rgba(232, 67, 147, ${alpha})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    /* ═══════════════════════════════════════════
+       NAV SCROLL EFFECT
+    ═══════════════════════════════════════════ */
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    /* ═══════════════════════════════════════════
+       SCROLL REVEAL
+    ═══════════════════════════════════════════ */
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
