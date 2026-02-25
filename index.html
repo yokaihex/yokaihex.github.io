@@ -1,0 +1,817 @@
+---
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>yokaihex — Security Researcher</title>
+  <meta name="description" content="Security researcher specializing in threat intelligence, vulnerability research, and AI-augmented security.">
+  <meta property="og:title" content="yokaihex — Security Researcher">
+  <meta property="og:description" content="Threat intelligence and vulnerability research.">
+  <meta property="og:url" content="https://yokaihex.com">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --bg-card: rgba(18, 18, 30, 0.6);
+      --text-primary: #e8e8ed;
+      --text-secondary: #8888a0;
+      --text-dim: #555570;
+      --accent-1: #6c5ce7;
+      --accent-2: #e84393;
+      --accent-3: #00cec9;
+      --accent-4: #fd79a8;
+      --border-subtle: rgba(136, 136, 160, 0.12);
+      --border-glow: rgba(108, 92, 231, 0.3);
+      --glass-bg: rgba(18, 18, 30, 0.65);
+      --glass-border: rgba(136, 136, 160, 0.1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent-1) var(--bg-primary);
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      line-height: 1.7;
+    }
+
+    /* ═══════════════════════════════════════════
+       PARTICLE CANVAS
+    ═══════════════════════════════════════════ */
+    #particle-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ═══════════════════════════════════════════
+       NAVIGATION
+    ═══════════════════════════════════════════ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(10, 10, 15, 0.7);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: all 0.4s ease;
+    }
+
+    nav.scrolled {
+      padding: 0.8rem 2rem;
+      background: rgba(10, 10, 15, 0.9);
+    }
+
+    .nav-brand {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-brand span {
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1.5px;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* ═══════════════════════════════════════════
+       LAYOUT
+    ═══════════════════════════════════════════ */
+    .content-wrapper {
+      position: relative;
+      z-index: 1;
+    }
+
+    section {
+      padding: 6rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* ═══════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 5rem;
+      max-width: 900px;
+      margin: 0 auto;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+
+    .hero-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent-1);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeSlideUp 0.8s ease 0.2s forwards;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeSlideUp 0.8s ease 0.4s forwards;
+    }
+
+    .hero h1 .gradient-text {
+      background: linear-gradient(
+        135deg,
+        var(--accent-1) 0%,
+        var(--accent-2) 25%,
+        var(--accent-4) 50%,
+        var(--accent-3) 75%,
+        var(--accent-1) 100%
+      );
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 8s ease infinite;
+    }
+
+    .hero-handle {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.3rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.03em;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeSlideUp 0.8s ease 0.5s forwards;
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 540px;
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeSlideUp 0.8s ease 0.7s forwards;
+    }
+
+    .hero-links {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeSlideUp 0.8s ease 0.9s forwards;
+    }
+
+    .hero-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .hero-link.primary {
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      color: white;
+    }
+    .hero-link.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(108, 92, 231, 0.35);
+    }
+
+    .hero-link.secondary {
+      border: 1px solid var(--border-glow);
+      color: var(--text-secondary);
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+    }
+    .hero-link.secondary:hover {
+      border-color: var(--accent-1);
+      color: var(--text-primary);
+      transform: translateY(-2px);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: fadeIn 1s ease 1.5s forwards;
+    }
+
+    .scroll-indicator span {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--accent-1), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+
+    /* ═══════════════════════════════════════════
+       SECTION HEADERS
+    ═══════════════════════════════════════════ */
+    .section-header {
+      margin-bottom: 3rem;
+    }
+
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent-1);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 600;
+    }
+
+    .section-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border-subtle);
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section-divider::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, var(--accent-1), var(--accent-2), transparent);
+      animation: shimmerLine 4s ease infinite;
+    }
+
+    /* ═══════════════════════════════════════════
+       ABOUT SECTION
+    ═══════════════════════════════════════════ */
+    .about-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .about-text p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.9;
+      margin-bottom: 1.5rem;
+    }
+
+    .about-text p:last-child { margin-bottom: 0; }
+
+    .about-text strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .career-path {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    .career-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: 'Space Mono', monospace;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      transition: all 0.3s ease;
+    }
+
+    .career-tag:hover {
+      border-color: var(--accent-1);
+      color: var(--text-primary);
+    }
+
+    .career-tag .tag-year {
+      color: var(--accent-1);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    /* ═══════════════════════════════════════════
+       CONTACT SECTION
+    ═══════════════════════════════════════════ */
+    .contact-content {
+    }
+
+    .contact-content > p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      margin-bottom: 2.5rem;
+      max-width: 500px;
+    }
+
+    /* ═══════════════════════════════════════════
+       CONTACT BUTTONS
+    ═══════════════════════════════════════════ */
+    .contact-block {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .contact-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+
+    .contact-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.9rem 1.8rem;
+      border-radius: 10px;
+      background: var(--glass-bg);
+      border: 1px solid var(--border-glow);
+      color: var(--accent-1);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .contact-btn:hover {
+      border-color: var(--accent-1);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(108, 92, 231, 0.2);
+    }
+
+    .contact-btn:active {
+      transform: translateY(0);
+    }
+
+    .contact-btn-icon {
+      font-size: 1.1rem;
+    }
+
+    .contact-btn-text code {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--accent-1);
+      letter-spacing: 0.03em;
+    }
+
+    .contact-btn-copied {
+      position: absolute;
+      top: -2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
+      color: var(--accent-3);
+      opacity: 0;
+      pointer-events: none;
+      transition: none;
+    }
+
+    .contact-btn-copied.show {
+      animation: copiedPop 1.5s ease forwards;
+    }
+
+    @keyframes copiedPop {
+      0% { opacity: 0; top: -1rem; }
+      15% { opacity: 1; top: -2rem; }
+      70% { opacity: 1; top: -2rem; }
+      100% { opacity: 0; top: -2.5rem; }
+    }
+
+    .pgp-keyserver-link {
+      display: inline-block;
+      margin-top: 0.5rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .pgp-keyserver-link:hover {
+      color: var(--accent-1);
+    }
+
+    /* ═══════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════ */
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      border-top: 1px solid var(--border-subtle);
+      position: relative;
+      z-index: 1;
+    }
+
+    footer p {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    footer .footer-disclaimer {
+      margin-top: 1rem;
+      color: var(--text-dim);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.75rem;
+      opacity: 0.45;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+
+    /* ═══════════════════════════════════════════
+       SCROLL REVEALS
+    ═══════════════════════════════════════════ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ═══════════════════════════════════════════
+       ANIMATIONS
+    ═══════════════════════════════════════════ */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(25px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 0.6; }
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 0.8; transform: scaleY(1.2); }
+    }
+
+    @keyframes shimmerLine {
+      0% { left: -100%; }
+      100% { left: 200%; }
+    }
+
+    @keyframes shimmerOnce {
+      from { left: -100%; }
+      to { left: 200%; }
+    }
+
+    /* ═══════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      nav { padding: 1rem; }
+      .nav-links { gap: 1.2rem; }
+      .nav-links a { font-size: 0.8rem; }
+      section { padding: 4rem 1.5rem; }
+      .hero { padding: 4rem 1.5rem; padding-top: 5rem; }
+      .hero h1 { font-size: 2.2rem; }
+      .hero-sub { font-size: 1rem; }
+      .hero-links { justify-content: center; }
+
+      .career-path { gap: 0.75rem; }
+      .career-tag { font-size: 0.78rem; padding: 0.4rem 0.8rem; }
+      .scroll-indicator { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .nav-links { gap: 0.8rem; }
+      .hero-links { flex-direction: column; align-items: center; }
+      .hero-link { justify-content: center; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <nav id="navbar">
+    <a href="#" class="nav-brand"><span>妖怪</span>hex</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="content-wrapper">
+
+    <!-- ═══════════ HERO ═══════════ -->
+    <section class="hero" id="hero">
+      <div class="hero-label">// security researcher</div>
+      <h1>
+        I'm <span class="gradient-text">yokaihex</span>
+      </h1>
+      <div class="hero-handle">(Johnathan Arneson)</div>
+      <p class="hero-sub">
+        Security researcher exploring the intersection of threat intelligence, vulnerability research, and AI-augmented security.
+      </p>
+      <div class="hero-links">
+        <a href="#contact" class="hero-link primary">Get in Touch</a>
+      </div>
+      <div class="scroll-indicator">
+        <span>scroll</span>
+        <div class="scroll-line"></div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════ ABOUT ═══════════ -->
+    <section id="about">
+      <div class="section-header reveal">
+        <div class="section-label">// 01 — about</div>
+        <h2 class="section-title">Background</h2>
+      </div>
+      <div class="about-content reveal">
+        <div class="about-text">
+          <p>
+            I'm a security researcher with over a decade of experience spanning threat intelligence, vulnerability research, and defensive security. My work focuses on understanding how threats operate and how defenders can stay ahead of them.
+          </p>
+          <p>
+            My background includes malware analysis, threat hunting, reverse engineering, and building detection capabilities across large-scale environments.
+          </p>
+          <p>
+            I'm particularly interested in how AI and automation can augment security research — making defenders faster, more thorough, and better equipped to handle the scale of modern threats.
+          </p>
+        </div>
+        <div class="career-path">
+          <div class="career-tag">
+            <span class="tag-year">10+ years</span> Security Research
+          </div>
+          <div class="career-tag">
+            <span class="tag-year">ongoing</span> Vulnerability Research
+          </div>
+          <div class="career-tag">
+            <span class="tag-year">ongoing</span> AI-Augmented Security
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ═══════════ CONTACT ═══════════ -->
+    <section id="contact">
+      <div class="section-header reveal">
+        <div class="section-label">// 02 — connect</div>
+        <h2 class="section-title">Get in Touch</h2>
+      </div>
+      <div class="contact-content reveal">
+        <p>Open to conversations about threat research, vulnerability disclosure, AI+security, and collaboration.</p>
+        <div class="contact-block">
+          <div class="contact-label">Email</div>
+          <button class="contact-btn" onclick="copyEmail(this)">
+            <span class="contact-btn-icon">✉</span>
+            <span class="contact-btn-text">yokaihex@pm.me</span>
+            <span class="contact-btn-copied">Copied!</span>
+          </button>
+        </div>
+        <div class="contact-block">
+          <div class="contact-label">PGP Fingerprint</div>
+          <button class="contact-btn" onclick="copyFingerprint(this)">
+            <span class="contact-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span>
+            <span class="contact-btn-text"><code>BA82 9FAC C510 723E AFB8 E68A 4AC6 F642 F496 1E26</code></span>
+            <span class="contact-btn-copied">Copied!</span>
+          </button>
+          <a href="https://keys.openpgp.org/search?q=yokaihex%40pm.me" class="pgp-keyserver-link" target="_blank" rel="noopener">keys.openpgp.org ↗</a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <p>yokaihex © 2026</p>
+    <p class="footer-disclaimer">All research presented here is conducted independently, on personal time, using personal resources. Views expressed are my own.</p>
+  </footer>
+
+  <script>
+    /* ═══════════════════════════════════════════
+       PARTICLE NETWORK
+    ═══════════════════════════════════════════ */
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let mouse = { x: null, y: null };
+    const PARTICLE_COUNT = 55;
+    const CONNECT_DISTANCE = 160;
+    const MOUSE_DISTANCE = 200;
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+    document.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = (Math.random() - 0.5) * 0.4;
+        this.r = Math.random() * 1.8 + 0.5;
+        this.baseAlpha = Math.random() * 0.4 + 0.15;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(108, 92, 231, ${this.baseAlpha})`;
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < CONNECT_DISTANCE) {
+            const alpha = (1 - dist / CONNECT_DISTANCE) * 0.15;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(108, 92, 231, ${alpha})`;
+            ctx.lineWidth = 0.6;
+            ctx.stroke();
+          }
+        }
+
+        if (mouse.x !== null) {
+          const dx = particles[i].x - mouse.x;
+          const dy = particles[i].y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MOUSE_DISTANCE) {
+            const alpha = (1 - dist / MOUSE_DISTANCE) * 0.25;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.strokeStyle = `rgba(232, 67, 147, ${alpha})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    /* ═══════════════════════════════════════════
+       COPY EMAIL
+    ═══════════════════════════════════════════ */
+    function copyEmail(btn) {
+      navigator.clipboard.writeText('yokaihex@pm.me');
+      const copied = btn.querySelector('.contact-btn-copied');
+      copied.classList.remove('show');
+      void copied.offsetWidth;
+      copied.classList.add('show');
+    }
+
+    function copyFingerprint(btn) {
+      navigator.clipboard.writeText('BA829FACC510723EAFB8E68A4AC6F642F4961E26');
+      const copied = btn.querySelector('.contact-btn-copied');
+      copied.classList.remove('show');
+      void copied.offsetWidth;
+      copied.classList.add('show');
+    }
+
+    /* ═══════════════════════════════════════════
+       NAV SCROLL EFFECT
+    ═══════════════════════════════════════════ */
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    /* ═══════════════════════════════════════════
+       SCROLL REVEAL
+    ═══════════════════════════════════════════ */
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
